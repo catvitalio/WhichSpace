@@ -127,6 +127,17 @@ struct CGSDisplaySpaceProvider: DisplaySpaceProvider {
 
     static let minimizedTags: UInt64 = 0x1400_0000_0000_0000
 
+    /// Owners of system chrome that sits on Spaces as layer-0 windows. On
+    /// macOS 27 Mission Control's WindowManager puts a Spaces bar label on
+    /// every Space and a thumbnail backdrop on each occupied one, which made
+    /// every empty Space read as occupied while the overview was up. Matched
+    /// by process name, which `kCGWindowOwnerName` carries unlocalized.
+    private static let systemChromeOwners: Set<String> = ["WindowManager", "Dock"]
+
+    static func isSystemChrome(ownerName: String?) -> Bool {
+        ownerName.map(systemChromeOwners.contains) ?? false
+    }
+
     private let conn: Int32
 
     init() {
@@ -216,7 +227,9 @@ struct CGSDisplaySpaceProvider: DisplaySpaceProvider {
 
         for window in windowList {
             // Filter to regular windows (layer 0) - skip menu bar, dock, etc.
-            guard let layer = window[kCGWindowLayer as String] as? Int, layer == 0 else {
+            guard let layer = window[kCGWindowLayer as String] as? Int, layer == 0,
+                  !Self.isSystemChrome(ownerName: window[kCGWindowOwnerName as String] as? String)
+            else {
                 continue
             }
 
@@ -266,6 +279,7 @@ struct CGSDisplaySpaceProvider: DisplaySpaceProvider {
         var orderedPIDs: [pid_t] = []
         for window in windowList {
             guard let layer = window[kCGWindowLayer as String] as? Int, layer == 0,
+                  !Self.isSystemChrome(ownerName: window[kCGWindowOwnerName as String] as? String),
                   let windowNumber = window[kCGWindowNumber as String] as? Int,
                   let ownerPID = window[kCGWindowOwnerPID as String] as? pid_t
             else {
@@ -317,6 +331,7 @@ struct CGSDisplaySpaceProvider: DisplaySpaceProvider {
             // Same qualification as spacesWithWindows: regular layer-0
             // windows larger than 5x5
             guard let layer = window[kCGWindowLayer as String] as? Int, layer == 0,
+                  !Self.isSystemChrome(ownerName: window[kCGWindowOwnerName as String] as? String),
                   let bounds = window[kCGWindowBounds as String] as? [String: Any],
                   let width = bounds["Width"] as? Double,
                   let height = bounds["Height"] as? Double,

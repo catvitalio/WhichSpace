@@ -819,6 +819,15 @@ struct SpacePickerTests {
         #expect(!CGSDisplaySpaceProvider.isSpaceOccupant(attributes: 0, tags: 0x1_0008_0001))
     }
 
+    @Test("Mission Control's system chrome never occupies a Space")
+    func systemChromeIsNotContent() {
+        // macOS 27 puts WindowManager's Spaces bar labels on every Space
+        #expect(CGSDisplaySpaceProvider.isSystemChrome(ownerName: "WindowManager"))
+        #expect(CGSDisplaySpaceProvider.isSystemChrome(ownerName: "Dock"))
+        #expect(!CGSDisplaySpaceProvider.isSystemChrome(ownerName: "Firefox"))
+        #expect(!CGSDisplaySpaceProvider.isSystemChrome(ownerName: nil))
+    }
+
     @Test("owners keep the front-to-back app order per Space")
     func ownersKeepAppOrder() {
         let owners = CGSDisplaySpaceProvider.resolveWindowOwners(
