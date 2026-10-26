@@ -5,8 +5,13 @@ import Testing
 struct AppActivationFollowerTests {
     private typealias Candidate = AppActivationFollower.WindowCandidate
 
-    private func window(_ spaceIDs: [Int], onScreen: Bool = false, minimized: Bool = false) -> Candidate {
-        Candidate(spaceIDs: spaceIDs, isOnScreen: onScreen, isMinimized: minimized)
+    private func window(
+        _ spaceIDs: [Int],
+        onScreen: Bool = false,
+        minimized: Bool = false,
+        closed: Bool = false
+    ) -> Candidate {
+        Candidate(spaceIDs: spaceIDs, isOnScreen: onScreen, isMinimized: minimized, isClosed: closed)
     }
 
     private func target(_ candidates: [Candidate], active: Set<Int> = [1], followable: Set<Int> = [1, 3, 4]) -> Int? {
@@ -47,6 +52,22 @@ struct AppActivationFollowerTests {
     @Test("leaves Spaces off the menu bar display to the Dock")
     func leavesOtherDisplaysNative() {
         #expect(target([window([7])], active: [1, 6]) == nil)
+    }
+
+    @Test("follows the last closed window when none is open")
+    func followsClosedWindowWithoutOpenOnes() {
+        #expect(target([window([], closed: true), window([3], closed: true), window([4], closed: true)]) == 3)
+    }
+
+    @Test("ignores closed windows while one is open")
+    func ignoresClosedWindowsBesideOpenOnes() {
+        #expect(target([window([3], closed: true), window([4])]) == 4)
+        #expect(target([window([3], closed: true), window([1], onScreen: true)]) == nil)
+    }
+
+    @Test("stays when the last closed window was on a visible Space")
+    func staysForClosedWindowOnVisibleSpace() {
+        #expect(target([window([1], closed: true), window([3], closed: true)]) == nil)
     }
 
     @Test("stays for an app without windows")

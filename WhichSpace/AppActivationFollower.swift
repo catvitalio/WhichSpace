@@ -10,6 +10,8 @@ final class AppActivationFollower {
         let spaceIDs: [Int]
         let isOnScreen: Bool
         let isMinimized: Bool
+        /// Closed, yet kept alive in the window server by the app
+        var isClosed = false
     }
 
     /// A repeat activation of the app just followed, within this window, is
@@ -157,14 +159,19 @@ final class AppActivationFollower {
         activeSpaceIDs: Set<Int>,
         followableSpaceIDs: Set<Int>
     ) -> Int? {
+        // A closed window still reports the Space it was closed on, and with
+        // no window left open that is where the Dock slides to. While any
+        // window is open, closed ones are stale and would mislead.
+        let live = candidates.filter { !$0.isClosed }
+        let considered = live.isEmpty ? candidates : live
         // A window in view, or one assigned to every Space, is already where
         // the user is
-        if candidates.contains(where: { $0.isOnScreen || $0.spaceIDs.count > 1 }) {
+        if considered.contains(where: { $0.isOnScreen || $0.spaceIDs.count > 1 }) {
             return nil
         }
         // Activation never unminimizes, so the Dock does not navigate for a
         // minimized window and neither should a follow
-        let placed = candidates.filter { !$0.isMinimized && $0.spaceIDs.count == 1 }
+        let placed = considered.filter { !$0.isMinimized && $0.spaceIDs.count == 1 }
         // A hidden app's window on a visible Space reappears right there
         if placed.contains(where: { activeSpaceIDs.contains($0.spaceIDs[0]) }) {
             return nil
@@ -204,8 +211,8 @@ final class AppActivationFollower {
         return (active, followable)
     }
 
-    /// The app's regular windows front to back, minus closed windows the app
-    /// keeps alive in the window server, which still report their old Space.
+    /// The app's regular windows front to back, including closed ones the
+    /// app keeps alive in the window server.
     private static func windowCandidates(ownedBy pid: pid_t, connection: Int32) -> [WindowCandidate] {
         let options: CGWindowListOption = [.optionAll, .excludeDesktopElements]
         guard let windowList = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]] else {
@@ -228,18 +235,24 @@ final class AppActivationFollower {
         let states = CGSDisplaySpaceProvider.windowServerStates(windows.map(\.id), connection: connection)
         return windows.compactMap { window in
             var isMinimized = false
+            var isClosed = false
             if let states {
-                guard let state = states[window.id],
-                      CGSDisplaySpaceProvider.isSpaceOccupant(attributes: state.attributes, tags: state.tags)
-                else {
+                // Unknown to the window server: gone, not merely closed
+                guard let state = states[window.id] else {
                     return nil
                 }
+                isClosed = !CGSDisplaySpaceProvider.isSpaceOccupant(attributes: state.attributes, tags: state.tags)
                 isMinimized = state.tags & CGSDisplaySpaceProvider.minimizedTags != 0
             }
             // Selector 0x7 = all spaces the window is on
             let spaces = SLSCopySpacesForWindows(connection, 0x7, [window.id] as CFArray)?
                 .takeRetainedValue() as? [Int] ?? []
-            return WindowCandidate(spaceIDs: spaces, isOnScreen: window.isOnScreen, isMinimized: isMinimized)
+            return WindowCandidate(
+                spaceIDs: spaces,
+                isOnScreen: window.isOnScreen,
+                isMinimized: isMinimized,
+                isClosed: isClosed
+            )
         }
     }
 
