@@ -295,6 +295,7 @@ struct DefaultsIsolationGuardTests {
             "spaceSymbolPositions",
             "spaceSymbols",
             "spaceSymbolWraps",
+            "switchAnimationDuration",
             "verticalScrollEnabled",
         ]
 

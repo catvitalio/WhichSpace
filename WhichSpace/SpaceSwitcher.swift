@@ -289,8 +289,9 @@ enum SpaceSwitcher {
             // Each completed gesture moves one Space, so recording per step
             // keeps a partial multi-step failure attributable to the Space
             // the posted gestures actually reached
+            let duration = steps == 1 ? switchAnimationDuration : 0
             for step in 1 ... steps {
-                guard postSwipeGesture(goRight: goRight, velocity: velocity) else {
+                guard postSwipeGesture(goRight: goRight, velocity: velocity, duration: duration) else {
                     return false
                 }
                 recordGestureSwitch(
@@ -401,7 +402,12 @@ enum SpaceSwitcher {
             )
         }
         if steps == 1 {
-            guard postStep(goRight: stepsRight, velocity: swipeVelocity, classic: classicRoute) else {
+            guard postStep(
+                goRight: stepsRight,
+                velocity: swipeVelocity,
+                duration: switchAnimationDuration,
+                classic: classicRoute
+            ) else {
                 return false
             }
             if !classicRoute {
@@ -422,7 +428,7 @@ enum SpaceSwitcher {
             // keeps a partial multi-step failure attributable to the Space
             // the posted gestures actually reached
             for step in 1 ... steps {
-                guard postSwipeGesture(goRight: stepsRight, velocity: velocity) else {
+                guard postSwipeGesture(goRight: stepsRight, velocity: velocity, duration: 0) else {
                     return false
                 }
                 recordGestureSwitch(
@@ -735,11 +741,16 @@ enum SpaceSwitcher {
 
     /// Posts one switch step left or right using the route the caller
     /// resolved, so the posted mechanism always matches what was recorded.
-    @MainActor private static func postStep(goRight: Bool, velocity: Double, classic: Bool) -> Bool {
+    @MainActor private static func postStep(
+        goRight: Bool,
+        velocity: Double,
+        duration: TimeInterval,
+        classic: Bool
+    ) -> Bool {
         if classic {
             return postHotKey(goRight ? HotKey.moveRight : HotKey.moveLeft)
         }
-        return postSwipeGesture(goRight: goRight, velocity: velocity)
+        return postSwipeGesture(goRight: goRight, velocity: velocity, duration: duration)
     }
 
     /// Switches via the "Switch to Desktop N" shortcut when the target has
@@ -860,10 +871,22 @@ enum SpaceSwitcher {
 
     // MARK: - Gesture Posting
 
+    /// How long an animated switch takes, zero for instant. Only macOS 27's
+    /// HID-backed swipes take a posted ramp; callers pass zero for multi-step
+    /// jumps, since only one ramp runs at a time and chained ones would cancel
+    /// one another.
+    @MainActor private static var switchAnimationDuration: TimeInterval {
+        guard requiresIOHIDPayload else {
+            return 0
+        }
+        return AppEnvironment.shared.store.switchAnimationDuration / 1000
+    }
+
     /// Posts a single synthetic dock-swipe gesture that moves one space left or right.
     /// All three phases (began, changed, ended) are required - with only two,
-    /// switching does not work while Mission Control is open.
-    private static func postSwipeGesture(goRight: Bool, velocity: Double) -> Bool {
+    /// switching does not work while Mission Control is open. A non-zero
+    /// `duration` only applies on macOS 27.
+    private static func postSwipeGesture(goRight: Bool, velocity: Double, duration: TimeInterval) -> Bool {
         guard requiresIOHIDPayload else {
             return postDockSwipe(phase: Phase.began, goRight: goRight, velocity: velocity)
                 && postDockSwipe(phase: Phase.changed, goRight: goRight, velocity: velocity)
@@ -876,9 +899,25 @@ enum SpaceSwitcher {
             requested: goRight,
             naturalScrollingEnabled: naturalScrollingEnabled
         )
-        return postAugmentedDockSwipe(phase: Phase.began, goRight: goRight, velocity: velocity)
-            && postAugmentedDockSwipe(phase: Phase.changed, goRight: goRight, velocity: velocity)
-            && postAugmentedDockSwipe(phase: Phase.ended, goRight: goRight, velocity: velocity)
+        if duration > 0 {
+            return SwipeAnimator.shared.start(goRight: goRight, duration: duration)
+        }
+        // Built in full before posting, so a failure never leaves a Began
+        // without its Ended
+        var events: [CGEvent] = []
+        for (phase, progress, velocity) in instantSwipePhases {
+            guard let event = makeAugmentedDockSwipe(
+                phase: phase, goRight: goRight, progress: progress, velocity: velocity
+            ) else {
+                return false
+            }
+            events.append(event)
+        }
+        SwipeAnimator.shared.finish()
+        for event in events {
+            event.post(tap: .cgSessionEventTap)
+        }
+        return true
     }
 
     /// Whether Natural scrolling is on. The key is absent until the user
@@ -1010,12 +1049,37 @@ enum SpaceSwitcher {
         var eventCount: UInt32
     }
 
-    private static func postAugmentedDockSwipe(phase: Int64, goRight: Bool, velocity: Double) -> Bool {
+    /// Progress of every phase of an instant switch. Full travel on Changed
+    /// shows a brief frame of the slide; near zero shows none, yet stays
+    /// above the 16.16 payload's smallest step so the direction survives.
+    private static let instantTravel = 0.0001
+
+    /// Progress on Began of an animated switch. Full travel there makes the
+    /// Dock act on the gesture twice.
+    private static let rampBeganTravel = 1.0 / 65536
+
+    /// Ended velocity that commits the switch. A slower one lets the Dock run
+    /// its own settle animation, which swallows a posted ramp.
+    private static let committingVelocity = 9999.0
+
+    private static let instantSwipePhases: [(phase: Int64, progress: Double, velocity: Double)] = [
+        (Phase.began, instantTravel, 0),
+        (Phase.changed, instantTravel, 0),
+        (Phase.ended, instantTravel, committingVelocity),
+    ]
+
+    /// `progress` and `velocity` are magnitudes; `goRight` signs them.
+    private static func makeAugmentedDockSwipe(
+        phase: Int64,
+        goRight: Bool,
+        progress magnitude: Double,
+        velocity: Double
+    ) -> CGEvent? {
         guard let event = CGEvent(source: nil) else {
-            return false
+            return nil
         }
 
-        let progress = goRight ? 1.0 : -1.0
+        let progress = goRight ? magnitude : -magnitude
         let signedVelocity = goRight ? velocity : -velocity
 
         event.setIntegerValueField(Field.eventType, value: EventType.dockControl)
@@ -1030,11 +1094,7 @@ enum SpaceSwitcher {
         event.setDoubleValueField(Field.eventTimestamp, value: Double(mach_absolute_time()))
         event.setDoubleValueField(Field.gestureSwipePositionX, value: 0.1)
 
-        guard let augmented = withIOHIDPayload(event, phase: phase, velocity: signedVelocity) else {
-            return false
-        }
-        augmented.post(tap: .cgSessionEventTap)
-        return true
+        return withIOHIDPayload(event, phase: phase, velocity: signedVelocity)
     }
 
     private static func withIOHIDPayload(_ event: CGEvent, phase: Int64, velocity: Double) -> CGEvent? {
@@ -1062,6 +1122,7 @@ enum SpaceSwitcher {
         let progress = event.getDoubleValueField(Field.gestureSwipeProgress)
         let positionX = event.getDoubleValueField(Field.gestureSwipePositionX)
         let positionY = event.getDoubleValueField(Field.gestureSwipePositionY)
+        let includesVelocity = velocity != 0 || phase == Phase.ended
         var data = Data()
 
         var header = IOHIDSystemQueueElementHeader(
@@ -1069,7 +1130,7 @@ enum SpaceSwitcher {
             senderID: 0,
             options: 0,
             attributeLength: 0,
-            eventCount: 2
+            eventCount: includesVelocity ? 2 : 1
         )
         withUnsafeBytes(of: &header) { data.append(contentsOf: $0) }
 
@@ -1090,6 +1151,9 @@ enum SpaceSwitcher {
             swipeProgress: fixedPoint(-progress)
         )
         withUnsafeBytes(of: &gesture) { data.append(contentsOf: $0) }
+        guard includesVelocity else {
+            return data
+        }
 
         var velocityEvent = IOHIDVelocityEventData(
             base: IOHIDEventBase(
@@ -1191,5 +1255,90 @@ enum SpaceSwitcher {
 
         NSLog("SpaceSwitcher: no app found on space \(spaceID)")
         return false
+    }
+}
+
+// MARK: - Swipe Animation
+
+extension SpaceSwitcher {
+    /// Posts an animated switch as a timed series of Changed samples, the way
+    /// a real swipe drags the Space across, from its own queue so a busy main
+    /// thread never stalls a frame. One ramp runs at a time: the Dock tracks a
+    /// single open gesture, so a new switch first commits the ramp in flight.
+    private final class SwipeAnimator: @unchecked Sendable {
+        static let shared = SwipeAnimator()
+
+        private static let frameRate = 120.0
+
+        private let queue = DispatchQueue(label: "io.gechr.WhichSpace.swipe-animation", qos: .userInteractive)
+
+        // Guarded by `queue`
+        private var ramp: (id: UInt64, goRight: Bool)?
+        private var lastID: UInt64 = 0
+
+        /// Must not be called from `queue`.
+        func start(goRight: Bool, duration: TimeInterval) -> Bool {
+            guard let began = makeAugmentedDockSwipe(
+                phase: Phase.began, goRight: goRight, progress: rampBeganTravel, velocity: 0
+            ) else {
+                return false
+            }
+            queue.sync {
+                commitRamp()
+                lastID &+= 1
+                let id = lastID
+                ramp = (id, goRight)
+                began.post(tap: .cgSessionEventTap)
+
+                let samples = max(2, Int((duration * Self.frameRate).rounded(.up)))
+                for index in 1 ... samples {
+                    let fraction = Double(index) / Double(samples)
+                    queue.asyncAfter(deadline: .now() + duration * fraction) { [self] in
+                        guard ramp?.id == id else {
+                            return
+                        }
+                        guard index < samples,
+                              // Cubic ease-out: a quick start that settles
+                              // into the Space, like the Dock's own slide
+                              let changed = makeAugmentedDockSwipe(
+                                  phase: Phase.changed,
+                                  goRight: goRight,
+                                  progress: 1 - pow(1 - fraction, 3),
+                                  velocity: 0
+                              )
+                        else {
+                            commitRamp()
+                            return
+                        }
+                        changed.post(tap: .cgSessionEventTap)
+                    }
+                }
+            }
+            return true
+        }
+
+        /// Commits the ramp in flight, if any, before an instant switch opens
+        /// a gesture of its own. Must not be called from `queue`.
+        func finish() {
+            queue.sync {
+                commitRamp()
+            }
+        }
+
+        /// Ends the open gesture at full travel. Runs on `queue`.
+        private func commitRamp() {
+            guard let ramp else {
+                return
+            }
+            self.ramp = nil
+            let terminal = [
+                (Phase.changed, 0.0),
+                (Phase.ended, committingVelocity),
+            ]
+            for (phase, velocity) in terminal {
+                makeAugmentedDockSwipe(phase: phase, goRight: ramp.goRight, progress: 1, velocity: velocity)?
+                    .post(tap: .cgSessionEventTap)
+            }
+        }
     }
 }

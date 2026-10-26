@@ -118,6 +118,7 @@ struct BackupSettings: Codable {
     var soundName: String
     var spacePickerMaxAppIcons: Int
     var spacePickerStyle: String?
+    var switchAnimationDuration: Double
     /// Present only in backups from versions with the per-display toggle;
     /// nil means both preference families are live data. Never encoded -
     /// the synthesized encoder omits nil optionals.
@@ -143,7 +144,8 @@ struct BackupSettings: Codable {
         case screenOrderNumbering
         case scrollHapticFeedback, scrollHapticIntensity, scrollSensitivity, scrollWrapAround
         case separatorColor, separatorStyle, showAllDisplays, showAllSpaces, shrinkIconToFit
-        case sizeScale, soundName, spacePickerMaxAppIcons, spacePickerStyle, uniqueIconsPerDisplay
+        case sizeScale, soundName, spacePickerMaxAppIcons, spacePickerStyle, switchAnimationDuration
+        case uniqueIconsPerDisplay
         case verticalScrollEnabled
     }
 
@@ -205,6 +207,8 @@ struct BackupSettings: Codable {
         spacePickerMaxAppIcons = try container.decodeIfPresent(Int.self, forKey: .spacePickerMaxAppIcons)
             ?? Layout.defaultSpacePickerMaxAppIcons
         spacePickerStyle = try container.decodeIfPresent(String.self, forKey: .spacePickerStyle)
+        switchAnimationDuration = try container.decodeIfPresent(Double.self, forKey: .switchAnimationDuration)
+            ?? Layout.defaultSwitchAnimationDuration
         uniqueIconsPerDisplay = try container.decodeIfPresent(Bool.self, forKey: .uniqueIconsPerDisplay)
         verticalScrollEnabled = try container.decodeIfPresent(Bool.self, forKey: .verticalScrollEnabled) ?? false
     }
@@ -251,6 +255,7 @@ struct BackupSettings: Codable {
         soundName: String,
         spacePickerMaxAppIcons: Int,
         spacePickerStyle: String?,
+        switchAnimationDuration: Double,
         verticalScrollEnabled: Bool
     ) {
         self.automaticallyChecksForUpdates = automaticallyChecksForUpdates
@@ -292,6 +297,7 @@ struct BackupSettings: Codable {
         self.soundName = soundName
         self.spacePickerMaxAppIcons = spacePickerMaxAppIcons
         self.spacePickerStyle = spacePickerStyle
+        self.switchAnimationDuration = switchAnimationDuration
         self.verticalScrollEnabled = verticalScrollEnabled
     }
 }
@@ -684,6 +690,7 @@ enum BackupManager {
             soundName: store.soundName,
             spacePickerMaxAppIcons: store.spacePickerMaxAppIcons,
             spacePickerStyle: store.spacePickerStyle.rawValue,
+            switchAnimationDuration: store.switchAnimationDuration,
             verticalScrollEnabled: store.verticalScrollEnabled
         )
 
@@ -860,6 +867,8 @@ enum BackupManager {
         store.spacePickerMaxAppIcons = backup.settings.spacePickerMaxAppIcons
         store.spacePickerStyle = backup.settings.spacePickerStyle
             .flatMap { SpacePickerStyle(rawValue: $0) } ?? .icons
+        store.switchAnimationDuration = backup.settings.switchAnimationDuration
+            .clamped(to: Layout.switchAnimationDurationRange)
         store.verticalScrollEnabled = backup.settings.verticalScrollEnabled
 
         // Apply shared space preferences

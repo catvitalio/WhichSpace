@@ -954,6 +954,26 @@ final class BackupManagerTests: IsolatedDefaultsTestCase {
         XCTAssertTrue(store.followAppActivation)
     }
 
+    func testSwitchAnimationDurationRoundTripsAndClamps() throws {
+        store.switchAnimationDuration = 150
+
+        let json = try BackupManager.encode(store: store)
+        store.resetAll()
+        XCTAssertEqual(store.switchAnimationDuration, Layout.defaultSwitchAnimationDuration)
+
+        let backup = try BackupManager.decode(jsonString: json)
+        BackupManager.apply(backup, to: store)
+        XCTAssertEqual(store.switchAnimationDuration, 150)
+
+        let stored = "\"switchAnimationDuration\" : 150"
+        XCTAssertTrue(json.contains(stored))
+        let oversized = try BackupManager.decode(
+            jsonString: json.replacingOccurrences(of: stored, with: "\"switchAnimationDuration\" : 5000")
+        )
+        BackupManager.apply(oversized, to: store)
+        XCTAssertEqual(store.switchAnimationDuration, Layout.switchAnimationDurationRange.upperBound)
+    }
+
     func testScreenOrderNumberingRoundTrip() throws {
         store.screenOrderNumbering = true
 

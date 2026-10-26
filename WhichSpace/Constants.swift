@@ -166,6 +166,10 @@ enum Layout {
     static let defaultScrollSensitivity = 100.0
     /// Slider bounds; higher divides the threshold, so less scrolling switches
     static let scrollSensitivityRange = 25.0 ... 200.0
+    /// Space switch animation (milliseconds); zero is instant
+    static let defaultSwitchAnimationDuration = 0.0
+    /// Slider bounds; the long end approaches the Dock's own slide
+    static let switchAnimationDurationRange = 0.0 ... 400.0
     /// Slider bounds, mapping to the very light through maximum labels
     static let scrollHapticIntensityRange = 1 ... 6
     /// Slider default, the strong tap
@@ -503,6 +507,8 @@ enum Localization {
     static let labelRight = String(localized: "label_right")
     static let labelSendWindow = String(localized: "label_send_window")
     static let labelSensitivity = String(localized: "label_sensitivity")
+    static let labelSwitchAnimation = String(localized: "label_switch_animation")
+    static let labelSwitchAnimationInstant = String(localized: "label_switch_animation_instant")
     static let labelSkinTone = String(localized: "label_skin_tone")
     static let labelSeparator = String(localized: "label_separator")
     static let labelSeparatorBullet = String(localized: "label_separator_bullet")
@@ -622,6 +628,7 @@ enum Localization {
     static let tipSearch = String(localized: "tip_search")
     static let tipSendSkipEmptySpaces = String(localized: "tip_send_skip_empty_spaces")
     static let tipSensitivity = String(localized: "tip_sensitivity")
+    static let tipSwitchAnimation = String(localized: "tip_switch_animation")
     static let tipSeparator = String(localized: "tip_separator")
     static let tipSeparatorStyle = String(localized: "tip_separator_style")
     static let tipSetDefaultStyle = String(localized: "tip_set_default_style")

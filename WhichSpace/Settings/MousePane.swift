@@ -107,6 +107,34 @@ struct MousePane: View {
                 anchor: .classicSwitching
             )
             SettingsRowDivider()
+            // Classic switching slides at the Dock's own pace, and only
+            // macOS 27's HID-backed swipes take a posted ramp
+            SettingsSliderRow(
+                title: Localization.labelSwitchAnimation,
+                value: model.binding(\.switchAnimationDuration),
+                range: Layout.switchAnimationDurationRange,
+                step: 10,
+                defaultValue: Layout.defaultSwitchAnimationDuration,
+                icon: "timer",
+                indented: true,
+                disabled: model.value(\.classicSpaceSwitching) || !SpaceSwitcher.requiresSpaceSwipeGestureSetting,
+                subtitle: Localization.tipSwitchAnimation,
+                anchor: .switchAnimation,
+                valueFormatter: { $0 == 0 ? Localization.labelSwitchAnimationInstant : String(format: "%.0f ms", $0) }
+            )
+            SettingsRowDivider()
+            // Following posts instant switches, which classic switching rules out
+            SettingsToggleRow(
+                title: Localization.toggleFollowAppActivation,
+                isOn: model.binding(\.followAppActivation),
+                icon: "arrow.right.to.line",
+                indented: true,
+                disabled: model.value(\.classicSpaceSwitching),
+                tint: permissionTint,
+                subtitle: Localization.tipFollowAppActivation,
+                anchor: .followAppActivation
+            )
+            SettingsRowDivider()
             SettingsToggleRow(
                 title: Localization.toggleScrollWrapAround,
                 isOn: model.binding(\.scrollWrapAround),

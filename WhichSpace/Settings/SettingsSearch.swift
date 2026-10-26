@@ -186,13 +186,6 @@ enum SettingsSearchIndex {
             keywords: [.startup]
         ),
         SettingsSearchEntry(
-            anchor: .followAppActivation,
-            section: nil,
-            title: Localization.toggleFollowAppActivation,
-            subtitle: Localization.tipFollowAppActivation,
-            keywords: [.space, .window]
-        ),
-        SettingsSearchEntry(
             anchor: .autoCheckUpdates,
             section: nil,
             title: Localization.toggleAutoCheckUpdates,
@@ -558,6 +551,20 @@ enum SettingsSearchIndex {
             title: Localization.toggleClassicSwitching,
             subtitle: Localization.tipClassicSwitching,
             keywords: [.space, .hotkey]
+        ),
+        SettingsSearchEntry(
+            anchor: .switchAnimation,
+            section: Localization.labelBehavior,
+            title: Localization.labelSwitchAnimation,
+            subtitle: Localization.tipSwitchAnimation,
+            keywords: [.space, .hotkey]
+        ),
+        SettingsSearchEntry(
+            anchor: .followAppActivation,
+            section: Localization.labelBehavior,
+            title: Localization.toggleFollowAppActivation,
+            subtitle: Localization.tipFollowAppActivation,
+            keywords: [.space, .window]
         ),
         SettingsSearchEntry(
             anchor: .scrollWrapAround,

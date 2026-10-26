@@ -131,6 +131,10 @@ enum KeySpecs {
         defaultValue: Layout.defaultScrollSensitivity
     )
     static let scrollWrapAround = TypedKeySpec(name: "scrollWrapAround", defaultValue: false)
+    static let switchAnimationDuration = TypedKeySpec(
+        name: "switchAnimationDuration",
+        defaultValue: Layout.defaultSwitchAnimationDuration
+    )
     static let verticalScrollEnabled = TypedKeySpec(name: "verticalScrollEnabled", defaultValue: false)
     static let separatorColor = TypedKeySpec(name: "separatorColor", defaultValue: Data?.none)
     static let separatorStyle = TypedKeySpec(name: "separatorStyle", defaultValue: SeparatorStyle.line)
@@ -227,6 +231,7 @@ enum KeySpecs {
         spaceSymbolPositions,
         spaceSymbols,
         spaceSymbolWraps,
+        switchAnimationDuration,
         verticalScrollEnabled,
     ]
 
@@ -256,6 +261,7 @@ enum KeySpecs {
         spacePickerStyle.name,
         spaceSounds.name,
         spaceStyleMigrationVersion.name,
+        switchAnimationDuration.name,
         verticalScrollEnabled.name,
     ]
 
@@ -621,6 +627,12 @@ final class DefaultsStore {
     var scrollSensitivity: Double {
         get { self[KeySpecs.scrollSensitivity] }
         set { self[KeySpecs.scrollSensitivity] = newValue }
+    }
+
+    /// Milliseconds
+    var switchAnimationDuration: Double {
+        get { self[KeySpecs.switchAnimationDuration] }
+        set { self[KeySpecs.switchAnimationDuration] = newValue }
     }
 
     var scrollWrapAround: Bool {

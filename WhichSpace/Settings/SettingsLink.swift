@@ -104,6 +104,7 @@ enum SettingsAnchor: String, CaseIterable {
     case click
     case scroll
     case classicSwitching = "classic-switching"
+    case switchAnimation = "switch-animation"
     case clickToSwitch = "click-to-switch"
     case verticalScroll = "vertical-scroll"
     case invertVerticalScroll = "invert-vertical-scroll"
@@ -143,7 +144,7 @@ enum SettingsAnchor: String, CaseIterable {
     /// The pane the row lives on, letting a link name the setting alone.
     var pane: SettingsPaneID {
         switch self {
-        case .launchAtLogin, .followAppActivation, .autoCheckUpdates, .autoInstallUpdates, .nightlyUpdates, .checkForUpdates,
+        case .launchAtLogin, .autoCheckUpdates, .autoInstallUpdates, .nightlyUpdates, .checkForUpdates,
              .backup, .diagnostics, .resetSettings:
             .general
         case .iconSize, .iconPadding, .shrinkToFit, .localSpaceNumbers, .displayOrder,
@@ -157,9 +158,9 @@ enum SettingsAnchor: String, CaseIterable {
              .symbolBackground, .foregroundColor, .backgroundColor, .invertColors, .badge,
              .badgePosition, .font, .sound, .customSounds:
             .spaces
-        case .accessibility, .behavior, .click, .scroll, .classicSwitching, .clickToSwitch,
-             .verticalScroll, .invertVerticalScroll, .horizontalScroll, .invertHorizontalScroll,
-             .scrollWrapAround, .scrollSensitivity, .scrollHaptics:
+        case .accessibility, .behavior, .click, .scroll, .classicSwitching, .switchAnimation,
+             .followAppActivation, .clickToSwitch, .verticalScroll, .invertVerticalScroll, .horizontalScroll,
+             .invertHorizontalScroll, .scrollWrapAround, .scrollSensitivity, .scrollHaptics:
             .mouse
         case .hotkeySwitchLeft, .hotkeySwitchRight, .hotkeySkipEmptySpaces, .hotkeySwitchPrevious,
              .hotkeySendLeft, .hotkeySendRight, .hotkeySendSkipEmptySpaces,
