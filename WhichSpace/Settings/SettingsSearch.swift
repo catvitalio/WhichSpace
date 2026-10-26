@@ -186,6 +186,13 @@ enum SettingsSearchIndex {
             keywords: [.startup]
         ),
         SettingsSearchEntry(
+            anchor: .followAppActivation,
+            section: nil,
+            title: Localization.toggleFollowAppActivation,
+            subtitle: Localization.tipFollowAppActivation,
+            keywords: [.space, .window]
+        ),
+        SettingsSearchEntry(
             anchor: .autoCheckUpdates,
             section: nil,
             title: Localization.toggleAutoCheckUpdates,

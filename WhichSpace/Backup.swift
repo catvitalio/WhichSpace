@@ -87,6 +87,7 @@ struct BackupSettings: Codable {
     var inactiveSpaceOpacity: Double
     var displayOrder: String?
     var emojiPickerSkinTone: Int
+    var followAppActivation: Bool
     var fullscreenIconStyle: String?
     var hideEmptySpaces: Bool
     var hideFullscreenApps: Bool
@@ -127,7 +128,8 @@ struct BackupSettings: Codable {
     private enum CodingKeys: String, CodingKey {
         case automaticallyChecksForUpdates, automaticallyDownloadsUpdates
         case classicSpaceSwitching
-        case clickToSwitchSpaces, dimInactiveSpaces, displayOrder, emojiPickerSkinTone, fullscreenIconStyle
+        case clickToSwitchSpaces, dimInactiveSpaces, displayOrder, emojiPickerSkinTone, followAppActivation
+        case fullscreenIconStyle
         case hideEmptySpaces
         case hideFullscreenApps, hideSingleSpace, horizontalScrollEnabled
         case hotkeysMoveSkipEmptySpaces, hotkeysSendSkipEmptySpaces, hotkeysSkipEmptySpaces
@@ -163,6 +165,7 @@ struct BackupSettings: Codable {
         displayOrder = try container.decodeIfPresent(String.self, forKey: .displayOrder)
         emojiPickerSkinTone = try container.decodeIfPresent(Int.self, forKey: .emojiPickerSkinTone)
             ?? SkinTone.default.rawValue
+        followAppActivation = try container.decodeIfPresent(Bool.self, forKey: .followAppActivation) ?? false
         fullscreenIconStyle = try container.decodeIfPresent(String.self, forKey: .fullscreenIconStyle)
         hideEmptySpaces = try container.decodeIfPresent(Bool.self, forKey: .hideEmptySpaces) ?? false
         hideFullscreenApps = try container.decodeIfPresent(Bool.self, forKey: .hideFullscreenApps) ?? false
@@ -217,6 +220,7 @@ struct BackupSettings: Codable {
         inactiveSpaceOpacity: Double,
         displayOrder: String?,
         emojiPickerSkinTone: Int,
+        followAppActivation: Bool,
         fullscreenIconStyle: String?,
         hideEmptySpaces: Bool,
         hideFullscreenApps: Bool,
@@ -257,6 +261,7 @@ struct BackupSettings: Codable {
         self.inactiveSpaceOpacity = inactiveSpaceOpacity
         self.displayOrder = displayOrder
         self.emojiPickerSkinTone = emojiPickerSkinTone
+        self.followAppActivation = followAppActivation
         self.fullscreenIconStyle = fullscreenIconStyle
         self.hideEmptySpaces = hideEmptySpaces
         self.hideFullscreenApps = hideFullscreenApps
@@ -648,6 +653,7 @@ enum BackupManager {
             inactiveSpaceOpacity: store.inactiveSpaceOpacity,
             displayOrder: store.displayOrder.rawValue,
             emojiPickerSkinTone: store.emojiPickerSkinTone.rawValue,
+            followAppActivation: store.followAppActivation,
             fullscreenIconStyle: store.fullscreenIconStyle.rawValue,
             hideEmptySpaces: store.hideEmptySpaces,
             hideFullscreenApps: store.hideFullscreenApps,
@@ -817,6 +823,7 @@ enum BackupManager {
             .flatMap { DisplayOrder(rawValue: $0) } ?? .system
         // Unrecognized values (from a newer app version or hand edit) keep the default
         store.emojiPickerSkinTone = SkinTone(rawValue: backup.settings.emojiPickerSkinTone) ?? .default
+        store.followAppActivation = backup.settings.followAppActivation
         store.fullscreenIconStyle = backup.settings.fullscreenIconStyle
             .flatMap { FullscreenIconStyle(rawValue: $0) } ?? .appIcon
         store.hideEmptySpaces = backup.settings.hideEmptySpaces

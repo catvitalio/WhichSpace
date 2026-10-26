@@ -47,6 +47,16 @@ struct GeneralPane: View {
             }
             SettingsSection {
                 SettingsToggleRow(
+                    title: Localization.toggleFollowAppActivation,
+                    isOn: model.binding(\.followAppActivation),
+                    icon: "arrow.right.to.line",
+                    tint: model.accessibilityGranted ? nil : Color(nsColor: .systemRed),
+                    subtitle: Localization.tipFollowAppActivation,
+                    anchor: .followAppActivation
+                )
+            }
+            SettingsSection {
+                SettingsToggleRow(
                     title: Localization.toggleAutoCheckUpdates,
                     isOn: Binding(
                         get: { updater?.automaticallyChecksForUpdates ?? false },

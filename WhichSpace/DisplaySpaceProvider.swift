@@ -123,7 +123,9 @@ struct CGSDisplaySpaceProvider: DisplaySpaceProvider {
     /// Tag bits carried by windows that are ordered out yet still occupy
     /// their Space: minimized to the Dock (bit 60, bit 58 on older
     /// releases) or part of a hidden app (bit 39).
-    private static let orderedOutOccupantTags: UInt64 = 0x1400_0080_0000_0000
+    private static let orderedOutOccupantTags: UInt64 = minimizedTags | 0x80_0000_0000
+
+    static let minimizedTags: UInt64 = 0x1400_0000_0000_0000
 
     private let conn: Int32
 
@@ -145,25 +147,38 @@ struct CGSDisplaySpaceProvider: DisplaySpaceProvider {
     /// unchanged when the query fails so occupancy degrades to the
     /// unfiltered behavior rather than reporting every Space empty.
     private func spaceOccupantWindowIDs(_ windowIDs: [Int]) -> [Int] {
-        guard !windowIDs.isEmpty,
-              let query = SLSWindowQueryWindows(conn, windowIDs as CFArray, Int32(windowIDs.count))
-        else {
+        guard let states = Self.windowServerStates(windowIDs, connection: conn) else {
             return windowIDs
+        }
+        return windowIDs.filter { id in
+            states[id].map { Self.isSpaceOccupant(attributes: $0.attributes, tags: $0.tags) } ?? false
+        }
+    }
+
+    /// Nil when the query fails. A window the window server no longer knows
+    /// is absent from the result rather than reported with empty state.
+    static func windowServerStates(
+        _ windowIDs: [Int],
+        connection: Int32
+    ) -> [Int: (attributes: UInt64, tags: UInt64)]? {
+        guard !windowIDs.isEmpty,
+              let query = SLSWindowQueryWindows(connection, windowIDs as CFArray, Int32(windowIDs.count))
+        else {
+            return nil
         }
         let queryObject = query.takeRetainedValue()
         guard let result = SLSWindowQueryResultCopyWindows(queryObject) else {
-            return windowIDs
+            return nil
         }
         let iterator = result.takeRetainedValue()
-        var occupants: Set<Int> = []
+        var states: [Int: (attributes: UInt64, tags: UInt64)] = [:]
         while SLSWindowIteratorAdvance(iterator) {
-            let attributes = SLSWindowIteratorGetAttributes(iterator)
-            let tags = SLSWindowIteratorGetTags(iterator)
-            if Self.isSpaceOccupant(attributes: attributes, tags: tags) {
-                occupants.insert(Int(SLSWindowIteratorGetWindowID(iterator)))
-            }
+            states[Int(SLSWindowIteratorGetWindowID(iterator))] = (
+                SLSWindowIteratorGetAttributes(iterator),
+                SLSWindowIteratorGetTags(iterator)
+            )
         }
-        return windowIDs.filter(occupants.contains)
+        return states
     }
 
     // swiftlint:disable:next discouraged_optional_collection

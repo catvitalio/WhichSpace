@@ -236,6 +236,7 @@ struct DefaultsIsolationGuardTests {
         let expectedKeyNames: Set = [
             "classicSpaceSwitching",
             "clickToSwitchSpaces",
+            "followAppActivation",
             "inactiveSpaceOpacity",
             "displayOrder",
             "displaySpaceBadges",

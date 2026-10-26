@@ -942,6 +942,18 @@ final class BackupManagerTests: IsolatedDefaultsTestCase {
         XCTAssertTrue(store.preserveSystemSpaceNumbers)
     }
 
+    func testFollowAppActivationRoundTrip() throws {
+        store.followAppActivation = true
+
+        let json = try BackupManager.encode(store: store)
+        store.resetAll()
+        XCTAssertFalse(store.followAppActivation)
+
+        let backup = try BackupManager.decode(jsonString: json)
+        BackupManager.apply(backup, to: store)
+        XCTAssertTrue(store.followAppActivation)
+    }
+
     func testScreenOrderNumberingRoundTrip() throws {
         store.screenOrderNumbering = true
 

@@ -155,6 +155,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUUpd
     /// Between Sparkle's show-update and finish-session callbacks
     private var isShowingUpdate = false
     private var hotkeyCenter: HotkeyCenter?
+    private var activationFollower: AppActivationFollower?
 
     private(set) var observationTask: Task<Void, Never>?
     private(set) var statusBarIconUpdateCount = 0
@@ -394,6 +395,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, SPUUpd
 
         // Register recorded global hotkeys; inert until the user records one
         hotkeyCenter = HotkeyCenter(appState: appState, store: store)
+
+        // Inert until the user enables following app activations
+        activationFollower = AppActivationFollower(store: store)
+        activationFollower?.start()
 
         // Keep the live capability reading current so the settings banner and
         // switching surfaces notice a mid-session revoke

@@ -35,6 +35,7 @@ extension TypedKeySpec: AnyKeySpec {
 /// 3. Tests will automatically pick up the new key
 enum KeySpecs {
     static let classicSpaceSwitching = TypedKeySpec(name: "classicSpaceSwitching", defaultValue: false)
+    static let followAppActivation = TypedKeySpec(name: "followAppActivation", defaultValue: false)
     /// Unset until the user chooses in Settings or answers the first left
     /// click's prompt, so a click can tell a choice of off apart from no
     /// choice at all
@@ -182,6 +183,7 @@ enum KeySpecs {
         displaySpaceSymbols,
         displaySpaceSymbolWraps,
         emojiPickerSkinTone,
+        followAppActivation,
         fullscreenIconStyle,
         hideEmptySpaces,
         hideFullscreenApps,
@@ -235,6 +237,7 @@ enum KeySpecs {
         classicSpaceSwitching.name,
         clickToSwitchSpaces.name,
         displaySpaceSounds.name,
+        followAppActivation.name,
         horizontalScrollEnabled.name,
         hotkeysMoveSkipEmptySpaces.name,
         hotkeysSendSkipEmptySpaces.name,
@@ -416,6 +419,11 @@ final class DefaultsStore {
     var classicSpaceSwitching: Bool {
         get { self[KeySpecs.classicSpaceSwitching] }
         set { self[KeySpecs.classicSpaceSwitching] = newValue }
+    }
+
+    var followAppActivation: Bool {
+        get { self[KeySpecs.followAppActivation] }
+        set { self[KeySpecs.followAppActivation] = newValue }
     }
 
     var clickToSwitchSpaces: Bool {

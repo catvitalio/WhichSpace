@@ -103,7 +103,12 @@ enum SpaceSwitcher {
 
     @MainActor private static func recordPrediction(_ index: Int, for display: String) {
         predictions[display] = (index, Date())
+        lastSwitchDate = Date()
     }
+
+    /// Lets activation following tell an app landing in focus after this
+    /// app's own switch from an activation the user asked for.
+    @MainActor private(set) static var lastSwitchDate: Date?
 
     /// Clears switch predictions once a real space snapshot lands. The
     /// applied display states also judge any recorded gesture switches, so
@@ -333,6 +338,7 @@ enum SpaceSwitcher {
         case let .activeDisplay(spaceID):
             return switchToSpace(id: spaceID)
         case let .otherDisplay(hotKey):
+            lastSwitchDate = Date()
             return postHotKey(hotKey)
         }
     }

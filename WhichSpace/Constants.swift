@@ -601,6 +601,7 @@ enum Localization {
         format: String(localized: "tip_label_input"), LabelTemplate.maxContentLength
     )
     static let tipLastChecked = String(localized: "tip_last_checked")
+    static let tipFollowAppActivation = String(localized: "tip_follow_app_activation")
     static let tipLaunchAtLogin = String(localized: "tip_launch_at_login")
     static let tipMoveSkipEmptySpaces = String(localized: "tip_move_skip_empty_spaces")
     static let tipNightlyUpdates = String(localized: "tip_nightly_updates")
@@ -641,6 +642,7 @@ enum Localization {
     static let toggleHideEmptySpaces = String(localized: "toggle_hide_empty_spaces")
     static let toggleHideFullscreenApps = String(localized: "toggle_hide_fullscreen_apps")
     static let toggleHideSingleSpace = String(localized: "toggle_hide_single_space")
+    static let toggleFollowAppActivation = String(localized: "toggle_follow_app_activation")
     static let toggleLaunchAtLogin = String(localized: "toggle_launch_at_login")
     static let toggleNightlyUpdates = String(localized: "toggle_nightly_updates")
     static let togglePreserveSystemSpaceNumbers = String(localized: "toggle_preserve_system_space_numbers")

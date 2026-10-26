@@ -225,6 +225,7 @@ enum Diagnostics {
             ("Shrink to fit", string(store.shrinkIconToFit)),
             ("Size scale", string(store.sizeScale)),
             ("Classic switching", string(store.classicSpaceSwitching)),
+            ("Follow app activation", string(store.followAppActivation)),
             ("Click to switch", store.clickToSwitchSpacesChoice.map(string) ?? "unset"),
             ("Vertical scroll", string(store.verticalScrollEnabled)),
             ("Horizontal scroll", string(store.horizontalScrollEnabled)),

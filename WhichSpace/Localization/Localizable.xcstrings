@@ -74949,6 +74949,268 @@
         }
       }
     },
+    "tip_follow_app_activation" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التبديل إلى مساحة التطبيق دون حركة عند تفعيله عبر ⌘-Tab أو Dock أو رابط مفتوح"
+          }
+        },
+        "bg" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Превключване към пространството на приложението без анимация, когато ⌘-Tab, Dock или отворена връзка го активира"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvia a l’espai d’una app sense animació quan ⌘-Tab, el Dock o un enllaç obert l’activa"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přepnout na plochu aplikace bez animace, když ji aktivuje ⌘-Tab, Dock nebo otevřený odkaz"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skift til en apps skrivebord uden animation, når ⌘-Tab, Dock eller et åbnet link aktiverer den"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Animation zum Space einer App wechseln, wenn ⌘-Tab, das Dock oder ein geöffneter Link sie aktiviert"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Εναλλαγή στον χώρο μιας εφαρμογής χωρίς κίνηση όταν την ενεργοποιεί το ⌘-Tab, το Dock ή ένας ανοιγμένος σύνδεσμος"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to an app’s Space without animation when ⌘-Tab, the Dock or an opened link activates it"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to an app’s Space without animation when ⌘-Tab, the Dock or an opened link activates it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar al espacio de una app sin animación cuando ⌘-Tab, el Dock o un enlace abierto la activa"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رفتن به فضای برنامه بدون انیمیشن وقتی ⌘-Tab، Dock یا یک پیوند بازشده آن را فعال می‌کند"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaihda apin työpöydälle ilman animaatiota, kun ⌘-Tab, Dock tai avattu linkki aktivoi sen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer à l’espace d’une app sans animation quand ⌘-Tab, le Dock ou un lien ouvert l’active"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מעבר למרחב של יישום ללא הנפשה כאשר ⌘-Tab, ה-Dock או קישור שנפתח מפעילים אותו"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "जब ⌘-Tab, Dock या खोला गया लिंक किसी ऐप को सक्रिय करे, तो बिना एनिमेशन उसके स्पेस पर जाएँ"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Váltás az app Space-ére animáció nélkül, amikor a ⌘-Tab, a Dock vagy egy megnyitott hivatkozás aktiválja"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beralih ke Space app tanpa animasi saat ⌘-Tab, Dock, atau tautan yang dibuka mengaktifkannya"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passa allo spazio di un’app senza animazione quando ⌘-Tab, il Dock o un link aperto la attiva"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘-Tab、Dock、開いたリンクでアプリがアクティブになったとき、アニメーションなしでそのスペースへ切り替えます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘-Tab, Dock 또는 열린 링크로 앱이 활성화되면 애니메이션 없이 해당 Space로 전환"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Префрли се на просторот на апликацијата без анимација кога ⌘-Tab, Dock или отворена врска ја активира"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tukar ke Space apl tanpa animasi apabila ⌘-Tab, Dock atau pautan yang dibuka mengaktifkannya"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bytt til appens skrivebord uten animasjon når ⌘-Tab, Dock eller en åpnet lenke aktiverer den"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zonder animatie naar de Space van een app gaan wanneer ⌘-Tab, het Dock of een geopende link hem activeert"
+          }
+        },
+        "nn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Byt til skrivebordet til appen utan animasjon når ⌘-Tab, Dock eller ei opna lenkje aktiverer han"
+          }
+        },
+        "pa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جدوں ⌘-Tab، Dock یا کھولیا لنک کسے ایپ نوں ایکٹیو کرے، تاں بنا اینیمیشن اوہدی سپیس تے جاؤ"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przełączaj na biurko aplikacji bez animacji, gdy aktywuje ją ⌘-Tab, Dock lub otwarty link"
+          }
+        },
+        "ps" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "کله چې ⌘-Tab، Dock یا پرانیستل شوې لېنک یو اپ فعال کړي، د هغې فضا ته پرته له انیمیشن واوړئ"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mudar para o espaço de uma app sem animação quando ⌘-Tab, a Dock ou uma ligação aberta a ativa"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mudar para o espaço de um app sem animação quando ⌘-Tab, o Dock ou um link aberto o ativa"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comută la spațiul aplicației fără animație când ⌘-Tab, Dock-ul sau un link deschis o activează"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переключаться на Space приложения без анимации, когда его активирует ⌘-Tab, Dock или открытая ссылка"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepnúť na plochu aplikácie bez animácie, keď ju aktivuje ⌘-Tab, Dock alebo otvorený odkaz"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пребаци на простор апликације без анимације када је активира ⌘-Tab, Dock или отворена веза"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Byt till appens skrivbord utan animering när ⌘-Tab, Dock eller en öppnad länk aktiverar den"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "สลับไปยัง Space ของแอปโดยไม่มีภาพเคลื่อนไหวเมื่อ ⌘-Tab, Dock หรือลิงก์ที่เปิดเรียกใช้งานแอป"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir uygulama ⌘-Tab, Dock veya açılan bir bağlantıyla etkinleştiğinde animasyonsuz olarak alanına geç"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перемикатися на Space програми без анімації, коли її активує ⌘-Tab, Dock або відкрите посилання"
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جب ⌘-Tab، Dock یا کھولا گیا لنک کسی ایپ کو فعال کرے تو بغیر اینیمیشن اس کی اسپیس پر جائیں"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chuyển đến Space của ứng dụng không có hiệu ứng khi ⌘-Tab, Dock hoặc liên kết được mở kích hoạt nó"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "當 ⌘-Tab、Dock 或開啟的連結啟用 App 時，無動畫切換到其空間"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当 ⌘-Tab、程序坞或打开的链接激活 App 时，无动画切换到其空间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "當 ⌘-Tab、Dock 或開啟的連結啟用 App 時，無動畫切換到其空間"
+          }
+        }
+      }
+    },
     "tip_font" : {
       "localizations" : {
         "ar" : {
@@ -89356,6 +89618,268 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "按一下以切換空間"
+          }
+        }
+      }
+    },
+    "toggle_follow_app_activation" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الانتقال الفوري إلى التطبيقات المفعّلة"
+          }
+        },
+        "bg" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Незабавен преход към активирани приложения"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salta a l’instant a les apps activades"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okamžitě přejít k aktivované aplikaci"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spring straks til aktiverede apps"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sofort zu aktivierten Apps springen"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Άμεση μετάβαση σε ενεργοποιημένες εφαρμογές"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jump instantly to activated apps"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jump instantly to activated apps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saltar al instante a las apps activadas"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "پرش فوری به برنامه‌های فعال‌شده"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siirry heti aktivoituun appiin"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aller instantanément aux apps activées"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "מעבר מיידי ליישומים שהופעלו"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "सक्रिय ऐप पर तुरंत जाएँ"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azonnali ugrás az aktivált appokhoz"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Langsung lompat ke app yang diaktifkan"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passa subito alle app attivate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクティブにしたアプリへ即座に移動"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "활성화된 앱으로 즉시 이동"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Веднаш оди до активирани апликации"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lompat serta-merta ke apl yang diaktifkan"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hopp straks til aktiverte apper"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direct naar geactiveerde apps springen"
+          }
+        },
+        "nn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hopp straks til aktiverte appar"
+          }
+        },
+        "pa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ایکٹیو کیتی ایپ تے فوراً جاؤ"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Natychmiast przechodź do aktywowanych aplikacji"
+          }
+        },
+        "ps" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فعال شوي اپ ته سمدستي ورتلل"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saltar de imediato para apps ativadas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ir instantaneamente para apps ativados"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salt instant la aplicațiile activate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мгновенно переходить к активированному приложению"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okamžite prejsť k aktivovanej aplikácii"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Одмах пређи на активиране апликације"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoppa direkt till aktiverade appar"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ข้ามไปยังแอปที่เปิดใช้งานทันที"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etkinleştirilen uygulamalara anında geç"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Миттєво переходити до активованої програми"
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فعال کردہ ایپ پر فوراً جائیں"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chuyển ngay đến ứng dụng được kích hoạt"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "即時跳到已啟用的 App"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即跳转到激活的 App"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即跳到已啟用的 App"
           }
         }
       }
