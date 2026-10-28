@@ -32,14 +32,27 @@ final class AppActivationFollower {
     /// windows was caused by that click, and the user is already there.
     static let clickWindow: TimeInterval = 0.5
 
-    /// How long an activation waits for the app's focus notification. One
-    /// follows within ~15 ms and names the exact window, where the activation
-    /// can only guess the frontmost; a switcher like AltTab picks a window on
-    /// one Space while the frontmost sits on another, and both acting posts
-    /// two switches in opposite directions.
-    static let focusGrace: TimeInterval = 0.03
-
     private static let logger = Logger(subsystem: "io.gechr.WhichSpace", category: "AppActivationFollower")
+
+    /// Whether the Dock switches to an activated app's Space itself, which
+    /// System Settings calls "When switching to an application, switch to a
+    /// Space with open windows for the application". It starts its own slide
+    /// on every activation: one instant swipe still beats it, but a jump
+    /// across several Spaces needs a swipe per Space and loses the race, so
+    /// long follows animate. Absent means on, the macOS default.
+    static var dockSwitchesSpacesOnActivation: Bool {
+        let domain = "com.apple.dock" as CFString
+        CFPreferencesAppSynchronize(domain)
+        return CFPreferencesCopyAppValue("workspaces-auto-swoosh" as CFString, domain) as? Bool ?? true
+    }
+
+    /// Opens Desktop & Dock scrolled to that switch. Turning it off there
+    /// takes effect at once, whereas a defaults write only reaches the Dock
+    /// on its next launch.
+    static let dockSwitchingSettingsURL = URL(
+        string: "x-apple.systempreferences:com.apple.Desktop-Settings.extension"
+            + "?whenSwitchingToAnApplicationSwitchToASpaceWithOpenWindowsForTheApplication"
+    )
 
     private let store: DefaultsStore
     private var observers: [NSObjectProtocol] = []
@@ -59,7 +72,8 @@ final class AppActivationFollower {
     /// The window the last focus notification named, nil until one arrives
     /// for the observed app
     private var lastFocusedWindowID: CGWindowID?
-    private var lastFocusEvent: (pid: pid_t, date: Date)?
+    /// Apps whose Accessibility connection this process has opened
+    private var warmedPIDs: Set<pid_t> = []
 
     init(store: DefaultsStore) {
         self.store = store
@@ -78,12 +92,20 @@ final class AppActivationFollower {
             let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
             let pid = app?.processIdentifier
             MainActor.assumeIsolated {
+                // The switch goes out before the focus observer is set up,
+                // which messages the app and would delay it
+                self?.handleActivation(pid: pid)
                 self?.observeFocus(of: pid)
-                let activatedAt = Date()
-                DispatchQueue.main.asyncAfter(deadline: .now() + Self.focusGrace) { [weak self] in
-                    MainActor.assumeIsolated {
-                        self?.handleActivation(pid: pid, activatedAt: activatedAt)
-                    }
+                self?.warmAccessibilityConnections()
+            }
+        })
+        observers.append(center.addObserver(
+            forName: NSWorkspace.didLaunchApplicationNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            // A launching app answers Accessibility only once it is up
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                MainActor.assumeIsolated {
+                    self?.warmAccessibilityConnections()
                 }
             }
         })
@@ -95,6 +117,34 @@ final class AppActivationFollower {
             }
         })
         observeFocus(of: NSWorkspace.shared.frontmostApplication?.processIdentifier)
+        warmAccessibilityConnections()
+    }
+
+    /// The first Accessibility message this process sends an app sets up the
+    /// connection and takes 8–30 ms, later ones ~0.1 ms. Paid during an
+    /// activation, that is long enough for the Dock's slide to start, so the
+    /// first follow to each app animated. One cheap query per app, off the
+    /// main thread, pays it ahead of time.
+    private func warmAccessibilityConnections() {
+        guard AXIsProcessTrusted() else {
+            return
+        }
+        let running = NSWorkspace.shared.runningApplications.filter { $0.activationPolicy == .regular }
+        let pids = Set(running.map(\.processIdentifier))
+        warmedPIDs.formIntersection(pids)
+        let cold = pids.subtracting(warmedPIDs).subtracting([ProcessInfo.processInfo.processIdentifier])
+        guard !cold.isEmpty else {
+            return
+        }
+        warmedPIDs.formUnion(cold)
+        DispatchQueue.global(qos: .utility).async {
+            for pid in cold {
+                let application = AXUIElementCreateApplication(pid)
+                AXUIElementSetMessagingTimeout(application, 0.25)
+                var value: CFTypeRef?
+                _ = AXUIElementCopyAttributeValue(application, kAXFocusedWindowAttribute as CFString, &value)
+            }
+        }
     }
 
     func stop() {
@@ -107,12 +157,10 @@ final class AppActivationFollower {
 
     // MARK: - Activation
 
-    private func handleActivation(pid: pid_t?, activatedAt: Date) {
+    /// Decides at once: the Dock marks the target Space current as soon as
+    /// its own slide starts, and a later look finds nothing left to switch.
+    private func handleActivation(pid: pid_t?) {
         guard let pid, pid != ProcessInfo.processInfo.processIdentifier, shouldConsiderActivations else {
-            return
-        }
-        if let lastFocusEvent, lastFocusEvent.pid == pid, lastFocusEvent.date >= activatedAt {
-            Self.logger.debug("activation of pid=\(pid) left to its focus notification")
             return
         }
         let now = Date()
@@ -124,10 +172,11 @@ final class AppActivationFollower {
             return
         }
         let layout = Self.spaceLayout(connection: conn)
-        // The focused window is where the Dock is headed; a switcher like
-        // AltTab focuses it before the focus observer for the app exists, so
-        // no focus notification reports it. Without one, as for an app with
-        // every window closed, the frontmost window stands in.
+        // The focused window is where the Dock is headed, and the frontmost
+        // may sit on another Space: a switcher like AltTab focuses its pick
+        // before activating, so no focus notification reports it either.
+        // Without one, as for an app with every window closed, the frontmost
+        // window stands in.
         let candidates = SystemFrontWindowLocator.focusedWindowID(ofApplication: pid)
             .flatMap { Self.windowCandidate($0, connection: conn, onScreen: onScreen) }
             .map { [$0] } ?? Self.windowCandidates(ownedBy: pid, connection: conn)
@@ -136,7 +185,10 @@ final class AppActivationFollower {
             activeSpaceIDs: layout.active,
             followableSpaceIDs: layout.followable
         ) else {
-            Self.logger.debug("activation of pid=\(pid) needs no switch")
+            Self.logger.debug("""
+            activation of pid=\(pid) needs no switch: \(String(describing: candidates), privacy: .public) \
+            active=\(layout.active.sorted(), privacy: .public)
+            """)
             return
         }
         Self.logger.info("following pid=\(pid) to space \(target)")
@@ -146,14 +198,20 @@ final class AppActivationFollower {
     /// The on-screen window list, or nil when something rules a follow out
     /// right now. Shared by activations and focus switches within an app.
     private func onScreenWindowsIfFollowable(pid: pid_t, now: Date) -> [[String: Any]]? {
-        if let lastUserSpaceChange, now.timeIntervalSince(lastUserSpaceChange) < Self.spaceChangeWindow {
+        // Both Space change guards only cover the app landing in focus on
+        // its own; a key or a click since the change, like a switcher's
+        // Enter, is the user asking for something new
+        let lastInput = Self.lastInputDate
+        if let lastUserSpaceChange, now.timeIntervalSince(lastUserSpaceChange) < Self.spaceChangeWindow,
+           lastInput <= lastUserSpaceChange
+        {
             Self.logger.debug("pid=\(pid) ruled out: user changed Space")
             return nil
         }
         // A switch this app posted itself, e.g. a hotkey or a menu bar click,
         // lands some app in focus on the arrival Space
         if let switchDate = SpaceSwitcher.lastSwitchDate, switchDate != followSwitchDate,
-           now.timeIntervalSince(switchDate) < Self.spaceChangeWindow
+           now.timeIntervalSince(switchDate) < Self.spaceChangeWindow, lastInput <= switchDate
         {
             Self.logger.debug("pid=\(pid) ruled out: own switch")
             return nil
@@ -247,7 +305,6 @@ final class AppActivationFollower {
             return
         }
         let now = Date()
-        lastFocusEvent = (pid, now)
         if let lastFocusFollow, lastFocusFollow.windowID == windowID,
            now.timeIntervalSince(lastFocusFollow.date) < Self.echoWindow
         {
@@ -319,8 +376,13 @@ final class AppActivationFollower {
         let live = candidates.filter { !$0.isClosed }
         let considered = live.isEmpty ? candidates : live
         // A window in view, or one assigned to every Space, is already where
-        // the user is
-        if considered.contains(where: { $0.isOnScreen || $0.spaceIDs.count > 1 }) {
+        // the user is. In view on a Space that is not current means the
+        // Dock's slide there has begun and is drawing it, which is exactly
+        // the slide to preempt.
+        let isInView = { (window: WindowCandidate) in
+            window.isOnScreen && (window.spaceIDs.isEmpty || !activeSpaceIDs.isDisjoint(with: window.spaceIDs))
+        }
+        if considered.contains(where: { isInView($0) || $0.spaceIDs.count > 1 }) {
             return nil
         }
         // Activation never unminimizes, so the Dock does not navigate for a
@@ -424,6 +486,14 @@ final class AppActivationFollower {
         let spaces = SLSCopySpacesForWindows(connection, 0x7, [id] as CFArray)?
             .takeRetainedValue() as? [Int] ?? []
         return WindowCandidate(spaceIDs: spaces, isOnScreen: isOnScreen, isMinimized: isMinimized, isClosed: isClosed)
+    }
+
+    /// From the session's HID state, so it covers input to every app
+    private static var lastInputDate: Date {
+        let seconds = [CGEventType.keyDown, .leftMouseDown, .rightMouseDown].map {
+            CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: $0)
+        }.min() ?? .infinity
+        return Date(timeIntervalSinceNow: -seconds)
     }
 
     private static var secondsSinceLastClick: TimeInterval {

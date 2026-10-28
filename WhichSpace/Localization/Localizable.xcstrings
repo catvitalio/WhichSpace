@@ -40611,6 +40611,268 @@
         }
       }
     },
+    "label_dock_switches_spaces" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS يبدّل المساحات أيضًا"
+          }
+        },
+        "bg" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS също превключва пространствата"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El macOS també canvia d’espai"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS také přepíná plochy"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS skifter også skriveborde"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS wechselt auch Spaces"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Το macOS αλλάζει επίσης χώρους"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS also switches Spaces"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS also switches Spaces"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS también cambia de espacio"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS هم فضاها را عوض می‌کند"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS vaihtaa myös työpöytiä"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS change aussi d’espace"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "גם macOS מחליף מרחבים"
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS भी स्पेस बदलता है"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A macOS is vált Space-t"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS juga berpindah Space"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anche macOS cambia spazio"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOSもスペースを切り替えます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS도 Space를 전환합니다"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS исто така префрла простори"
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS juga menukar Space"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS bytter også skrivebord"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS wisselt ook van Space"
+          }
+        },
+        "nn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS byter også skrivebord"
+          }
+        },
+        "pa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS وی سپیس بدلدا اے"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS też przełącza biurka"
+          }
+        },
+        "ps" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS هم فضاګانې بدلوي"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O macOS também muda de espaço"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O macOS também troca de espaço"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Și macOS schimbă spațiile"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS тоже переключает Spaces"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS tiež prepína plochy"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS такође пребацује просторе"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS byter också skrivbord"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS ก็สลับ Space ด้วย"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS da alanları değiştiriyor"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS теж перемикає Spaces"
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS بھی اسپیسز بدلتا ہے"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS cũng chuyển Space"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 亦會切換空間"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 也会切换空间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 也會切換空間"
+          }
+        }
+      }
+    },
     "label_font" : {
       "localizations" : {
         "ar" : {
@@ -75469,6 +75731,268 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用它們在 macOS 顯示器排列中的位置"
+          }
+        }
+      }
+    },
+    "tip_dock_switches_spaces" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تظل القفزات عبر عدة مساحات تنزلق. أوقف الانتقال إلى مساحة التطبيق في إعدادات سطح المكتب وDock."
+          }
+        },
+        "bg" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скоковете през няколко пространства може още да се плъзгат. Изключете превключването към пространството на приложението в настройките „Бюро и Dock“."
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Els salts entre diversos espais encara poden lliscar. Desactiva el canvi a l’espai d’una app a la configuració d’Escriptori i Dock."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skoky přes několik ploch se mohou stále posouvat. Vypněte přepínání na plochu aplikace v nastavení Plocha a Dock."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spring over flere skriveborde kan stadig glide. Slå skift til en apps skrivebord fra i indstillingerne for Skrivebord og Dock."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprünge über mehrere Spaces können weiter gleiten. Deaktiviere den Wechsel zum Space einer App in den Einstellungen „Schreibtisch & Dock“."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Τα άλματα σε πολλούς χώρους μπορεί να συνεχίσουν να γλιστρούν. Απενεργοποιήστε τη μετάβαση στον χώρο εφαρμογής στις ρυθμίσεις Γραφείου και Dock."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jumps across several Spaces can still slide. Turn off switching to an app’s Space in Desktop & Dock settings."
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jumps across several Spaces can still slide. Turn off switching to an app’s Space in Desktop & Dock settings."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los saltos entre varios espacios aún pueden deslizarse. Desactiva el cambio al espacio de una app en los ajustes de Escritorio y Dock."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "پرش از چند فضا ممکن است هنوز بلغزد. رفتن به فضای برنامه را در تنظیمات میز کار و Dock خاموش کنید."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hypyt usean työpöydän yli voivat yhä liukua. Laita apin työpöydälle siirtyminen pois Työpöytä ja Dock -asetuksista."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les sauts sur plusieurs espaces peuvent encore glisser. Désactivez le passage à l’espace d’une app dans les réglages Bureau et Dock."
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "קפיצות על פני כמה מרחבים עדיין עשויות להחליק. כבו את המעבר למרחב של יישום בהגדרות שולחן העבודה וה-Dock."
+          }
+        },
+        "hi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "कई स्पेस के पार छलांग अब भी स्लाइड हो सकती है। डेस्कटॉप और Dock सेटिंग्स में ऐप के स्पेस पर जाना बंद करें।"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A több Space-en átívelő ugrások még csúszhatnak. Kapcsold ki az app Space-ére váltást az Íróasztal és Dock beállításaiban."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lompatan melewati beberapa Space masih bisa bergeser. Matikan perpindahan ke Space app di pengaturan Desktop & Dock."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I salti su più spazi possono ancora scorrere. Disattiva il passaggio allo spazio di un’app nelle impostazioni Scrivania e Dock."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複数のスペースをまたぐ移動はスライドすることがあります。「デスクトップとDock」設定でアプリのスペースへの切り替えをオフにしてください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여러 Space를 건너뛰는 이동은 여전히 슬라이드될 수 있습니다. 데스크탑 및 Dock 설정에서 앱의 Space로 전환을 끄세요."
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скоковите низ неколку простори може сè уште да лизгаат. Исклучете го префрлањето на просторот на апликацијата во поставките за Работна површина и Dock."
+          }
+        },
+        "ms" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lompatan merentasi beberapa Space masih boleh meluncur. Matikan pertukaran ke Space apl dalam tetapan Desktop & Dock."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hopp over flere skrivebord kan fortsatt gli. Slå av bytte til en apps skrivebord i innstillingene for Skrivebord og Dock."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprongen over meerdere Spaces kunnen nog schuiven. Schakel wisselen naar de Space van een app uit in de instellingen voor Bureaublad en Dock."
+          }
+        },
+        "nn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hopp over fleire skrivebord kan framleis gli. Slå av byte til skrivebordet til ein app i innstillingane for Skrivebord og Dock."
+          }
+        },
+        "pa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "کئی سپیساں پار چھال اجے وی سلائیڈ ہو سکدی اے۔ ڈیسک ٹاپ تے Dock سیٹنگز وچ ایپ دی سپیس تے جانا بند کرو۔"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skoki przez kilka biurek mogą nadal się przesuwać. Wyłącz przełączanie na biurko aplikacji w ustawieniach Biurko i Dock."
+          }
+        },
+        "ps" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "د څو فضاګانو په اوږدو ټوپونه لا هم ښوییدای شي. د ډیسکټاپ او Dock په تنظیماتو کې د اپ فضا ته تلل بند کړئ."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os saltos por vários espaços ainda podem deslizar. Desative a mudança para o espaço de uma app nas definições de Secretária e Dock."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saltos por vários espaços ainda podem deslizar. Desative a troca para o espaço de um app nos ajustes de Mesa e Dock."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salturile peste mai multe spații pot încă să gliseze. Dezactivează comutarea la spațiul unei aplicații în configurările Birou și Dock."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прыжки через несколько Spaces могут всё ещё сдвигаться с анимацией. Отключите переход в Space приложения в настройках «Рабочий стол и Dock»."
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skoky cez niekoľko plôch sa môžu stále posúvať. Vypnite prepínanie na plochu aplikácie v nastaveniach Plocha a Dock."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скокови преко више простора и даље могу да клизе. Искључите пребацивање на простор апликације у подешавањима Радна површина и Dock."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hopp över flera skrivbord kan fortfarande glida. Stäng av byte till en apps skrivbord i inställningarna för Skrivbord och Dock."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "การกระโดดข้ามหลาย Space อาจยังเลื่อนอยู่ ปิดการสลับไปยัง Space ของแอปในการตั้งค่าเดสก์ท็อปและ Dock"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Birkaç alan üzerinden atlamalar hâlâ kayabilir. Masaüstü ve Dock ayarlarında bir uygulamanın alanına geçişi kapatın."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стрибки через кілька Spaces усе ще можуть зсуватися з анімацією. Вимкніть перехід у Space програми в параметрах «Робочий стіл і Dock»."
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "کئی اسپیسز کے پار چھلانگیں اب بھی سلائیڈ ہو سکتی ہیں۔ ڈیسک ٹاپ اور Dock سیٹنگز میں ایپ کی اسپیس پر جانا بند کریں۔"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Các bước nhảy qua nhiều Space vẫn có thể trượt. Tắt chuyển đến Space của ứng dụng trong cài đặt Màn hình nền & Dock."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跨越多個空間的跳轉仍可能出現滑動。請在「桌面與 Dock」設定中關閉切換至 App 的空間。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跨越多个空间的跳转仍可能出现滑动。请在“桌面与程序坞”设置中关闭切换到 App 的空间。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跨越多個空間的跳轉仍可能出現滑動。請在「桌面與 Dock」設定中關閉切換至 App 的空間。"
           }
         }
       }

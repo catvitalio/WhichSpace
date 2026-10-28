@@ -1,3 +1,5 @@
+import AppKit
+import Combine
 import SwiftUI
 
 /// The Mouse settings pane: click and scroll Space switching, scroll
@@ -8,6 +10,10 @@ struct MousePane: View {
     /// Plays a haptic sample at the given intensity so slider changes can be
     /// felt while dragging, matching the status menu's slider
     let onHapticPreview: (Int) -> Void
+
+    /// Re-read whenever the app comes back to the front, which is how the
+    /// user returns from turning the Dock's switching off
+    @State private var dockSwitchesSpaces = AppActivationFollower.dockSwitchesSpacesOnActivation
 
     var body: some View {
         // The banner pins above the scroll view, so the warning stays visible
@@ -39,6 +45,9 @@ struct MousePane: View {
         }
         scrollSection
         behaviorSection
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                dockSwitchesSpaces = AppActivationFollower.dockSwitchesSpacesOnActivation
+            }
     }
 
     private var scrollSection: some View {
@@ -134,6 +143,22 @@ struct MousePane: View {
                 subtitle: Localization.tipFollowAppActivation,
                 anchor: .followAppActivation
             )
+            if model.value(\.followAppActivation), !model.value(\.classicSpaceSwitching), dockSwitchesSpaces,
+               let url = AppActivationFollower.dockSwitchingSettingsURL
+            {
+                SettingsRowDivider()
+                SettingsRow(
+                    icon: "exclamationmark.triangle",
+                    subtitle: Localization.tipDockSwitchesSpaces,
+                    indented: true
+                ) {
+                    Text(Localization.labelDockSwitchesSpaces)
+                } control: {
+                    Button(Localization.actionOpenSystemSettings) {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+            }
             SettingsRowDivider()
             SettingsToggleRow(
                 title: Localization.toggleScrollWrapAround,

@@ -28,6 +28,12 @@ struct AppActivationFollowerTests {
         #expect(target([window([3]), window([1], onScreen: true)]) == nil)
     }
 
+    @Test("preempts a slide already drawing the window")
+    func preemptsSlideInProgress() {
+        #expect(target([window([3], onScreen: true)]) == 3)
+        #expect(target([window([], onScreen: true), window([3])]) == nil)
+    }
+
     @Test("stays for a window assigned to every Space")
     func staysForAllSpacesWindow() {
         #expect(target([window([1, 3]), window([3])]) == nil)
