@@ -32,15 +32,34 @@ final class AppActivationFollower {
     /// windows was caused by that click, and the user is already there.
     static let clickWindow: TimeInterval = 0.5
 
+    /// How long an activation waits for the app's focus notification. One
+    /// follows within ~15 ms and names the exact window, where the activation
+    /// can only guess the frontmost; a switcher like AltTab picks a window on
+    /// one Space while the frontmost sits on another, and both acting posts
+    /// two switches in opposite directions.
+    static let focusGrace: TimeInterval = 0.03
+
     private static let logger = Logger(subsystem: "io.gechr.WhichSpace", category: "AppActivationFollower")
 
     private let store: DefaultsStore
     private var observers: [NSObjectProtocol] = []
     private var lastFollow: (pid: pid_t, spaceID: Int, date: Date)?
+    /// Every follow still settling. Rapid switches land their Space change
+    /// notifications after the next follow, so crediting the last alone
+    /// mistakes the earlier ones for the user's own switches.
+    private var settlingFollows: [(spaceID: Int, date: Date)] = []
     /// `SpaceSwitcher.lastSwitchDate` as the last follow left it, so the
     /// follow's own switch never reads as the user switching
     private var followSwitchDate: Date?
     private var lastUserSpaceChange: Date?
+    /// Focus switches between windows of the frontmost app, e.g. through
+    /// AltTab, activate nothing, so they are only seen through Accessibility
+    private var focusObserver: (pid: pid_t, observer: AXObserver)?
+    private var lastFocusFollow: (windowID: CGWindowID, date: Date)?
+    /// The window the last focus notification named, nil until one arrives
+    /// for the observed app
+    private var lastFocusedWindowID: CGWindowID?
+    private var lastFocusEvent: (pid: pid_t, date: Date)?
 
     init(store: DefaultsStore) {
         self.store = store
@@ -59,7 +78,13 @@ final class AppActivationFollower {
             let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
             let pid = app?.processIdentifier
             MainActor.assumeIsolated {
-                self?.handleActivation(pid: pid)
+                self?.observeFocus(of: pid)
+                let activatedAt = Date()
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.focusGrace) { [weak self] in
+                    MainActor.assumeIsolated {
+                        self?.handleActivation(pid: pid, activatedAt: activatedAt)
+                    }
+                }
             }
         })
         observers.append(center.addObserver(
@@ -69,6 +94,7 @@ final class AppActivationFollower {
                 self?.handleSpaceChange()
             }
         })
+        observeFocus(of: NSWorkspace.shared.frontmostApplication?.processIdentifier)
     }
 
     func stop() {
@@ -76,58 +102,186 @@ final class AppActivationFollower {
             NSWorkspace.shared.notificationCenter.removeObserver(observer)
         }
         observers.removeAll()
+        observeFocus(of: nil)
     }
 
     // MARK: - Activation
 
-    private func handleActivation(pid: pid_t?) {
+    private func handleActivation(pid: pid_t?, activatedAt: Date) {
         guard let pid, pid != ProcessInfo.processInfo.processIdentifier, shouldConsiderActivations else {
+            return
+        }
+        if let lastFocusEvent, lastFocusEvent.pid == pid, lastFocusEvent.date >= activatedAt {
+            Self.logger.debug("activation of pid=\(pid) left to its focus notification")
             return
         }
         let now = Date()
         if let lastFollow, lastFollow.pid == pid, now.timeIntervalSince(lastFollow.date) < Self.echoWindow {
             return
         }
-        if let lastUserSpaceChange, now.timeIntervalSince(lastUserSpaceChange) < Self.spaceChangeWindow {
+        let conn = _CGSDefaultConnection()
+        guard let onScreen = onScreenWindowsIfFollowable(pid: pid, now: now) else {
             return
+        }
+        let layout = Self.spaceLayout(connection: conn)
+        // The focused window is where the Dock is headed; a switcher like
+        // AltTab focuses it before the focus observer for the app exists, so
+        // no focus notification reports it. Without one, as for an app with
+        // every window closed, the frontmost window stands in.
+        let candidates = SystemFrontWindowLocator.focusedWindowID(ofApplication: pid)
+            .flatMap { Self.windowCandidate($0, connection: conn, onScreen: onScreen) }
+            .map { [$0] } ?? Self.windowCandidates(ownedBy: pid, connection: conn)
+        guard let target = Self.targetSpaceID(
+            for: candidates,
+            activeSpaceIDs: layout.active,
+            followableSpaceIDs: layout.followable
+        ) else {
+            Self.logger.debug("activation of pid=\(pid) needs no switch")
+            return
+        }
+        Self.logger.info("following pid=\(pid) to space \(target)")
+        follow(pid: pid, to: target, now: now)
+    }
+
+    /// The on-screen window list, or nil when something rules a follow out
+    /// right now. Shared by activations and focus switches within an app.
+    private func onScreenWindowsIfFollowable(pid: pid_t, now: Date) -> [[String: Any]]? {
+        if let lastUserSpaceChange, now.timeIntervalSince(lastUserSpaceChange) < Self.spaceChangeWindow {
+            Self.logger.debug("pid=\(pid) ruled out: user changed Space")
+            return nil
         }
         // A switch this app posted itself, e.g. a hotkey or a menu bar click,
         // lands some app in focus on the arrival Space
         if let switchDate = SpaceSwitcher.lastSwitchDate, switchDate != followSwitchDate,
            now.timeIntervalSince(switchDate) < Self.spaceChangeWindow
         {
-            return
+            Self.logger.debug("pid=\(pid) ruled out: own switch")
+            return nil
         }
         // A held button is a window drag, which swallows synthetic swipes
         guard NSEvent.pressedMouseButtons == 0 else {
-            return
+            Self.logger.debug("pid=\(pid) ruled out: mouse button held")
+            return nil
         }
-
-        let conn = _CGSDefaultConnection()
         let onScreen = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[String: Any]] ?? []
         // Mission Control navigates by itself, and a swipe posted into it is
         // judged against the overview rather than the desktop
         guard !Self.isOverviewShowing(in: onScreen) else {
-            return
+            Self.logger.debug("pid=\(pid) ruled out: overview showing")
+            return nil
         }
         if Self.secondsSinceLastClick < Self.clickWindow, Self.pointerIsInsideWindow(ownedBy: pid, in: onScreen) {
-            return
+            Self.logger.debug("pid=\(pid) ruled out: click inside its window")
+            return nil
         }
+        return onScreen
+    }
 
-        let layout = Self.spaceLayout(connection: conn)
-        guard let target = Self.targetSpaceID(
-            for: Self.windowCandidates(ownedBy: pid, connection: conn),
-            activeSpaceIDs: layout.active,
-            followableSpaceIDs: layout.followable
-        ) else {
-            return
-        }
-        Self.logger.info("following pid=\(pid) to space \(target)")
+    private func follow(pid: pid_t, to target: Int, now: Date) {
         guard SpaceSwitcher.switchToSpace(id: target) else {
             return
         }
         lastFollow = (pid, target, now)
+        settlingFollows.removeAll { now.timeIntervalSince($0.date) >= Self.followSettleWindow }
+        settlingFollows.append((target, now))
         followSwitchDate = SpaceSwitcher.lastSwitchDate
+    }
+
+    // MARK: - Focus Within an App
+
+    /// Replaces the focus observer with one on `pid`. The run loop source
+    /// sits on the main run loop, so the callback arrives on the main thread.
+    private func observeFocus(of pid: pid_t?) {
+        guard pid != focusObserver?.pid else {
+            return
+        }
+        if let focusObserver {
+            CFRunLoopRemoveSource(
+                CFRunLoopGetMain(), AXObserverGetRunLoopSource(focusObserver.observer), .defaultMode
+            )
+            self.focusObserver = nil
+            lastFocusedWindowID = nil
+        }
+        guard let pid, pid != ProcessInfo.processInfo.processIdentifier, AXIsProcessTrusted() else {
+            return
+        }
+        var created: AXObserver?
+        guard AXObserverCreate(pid, Self.focusCallback, &created) == .success, let observer = created else {
+            return
+        }
+        // Unretained: the follower outlives its observer, which `stop` removes
+        let refcon = Unmanaged.passUnretained(self).toOpaque()
+        let application = AXUIElementCreateApplication(pid)
+        // Switching back to a window on another Space may only change the
+        // main window: Ghostty reports nothing else then
+        let notifications = [kAXFocusedWindowChangedNotification, kAXMainWindowChangedNotification]
+        var subscribed = false
+        for notification in notifications {
+            subscribed = AXObserverAddNotification(observer, application, notification as CFString, refcon)
+                == .success || subscribed
+        }
+        guard subscribed else {
+            return
+        }
+        CFRunLoopAddSource(CFRunLoopGetMain(), AXObserverGetRunLoopSource(observer), .defaultMode)
+        focusObserver = (pid, observer)
+    }
+
+    private static let focusCallback: AXObserverCallback = { _, element, _, refcon in
+        var windowID: CGWindowID = 0
+        guard let refcon, _AXUIElementGetWindow(element, &windowID) == .success else {
+            return
+        }
+        let follower = Unmanaged<AppActivationFollower>.fromOpaque(refcon).takeUnretainedValue()
+        MainActor.assumeIsolated {
+            follower.handleFocusedWindowChange(windowID)
+        }
+    }
+
+    private func handleFocusedWindowChange(_ windowID: CGWindowID) {
+        // A focus change and a main window change name the same window
+        // back to back
+        let previousWindowID = lastFocusedWindowID
+        lastFocusedWindowID = windowID
+        guard windowID != previousWindowID, let pid = focusObserver?.pid, shouldConsiderActivations else {
+            return
+        }
+        let now = Date()
+        lastFocusEvent = (pid, now)
+        if let lastFocusFollow, lastFocusFollow.windowID == windowID,
+           now.timeIntervalSince(lastFocusFollow.date) < Self.echoWindow
+        {
+            return
+        }
+        let conn = _CGSDefaultConnection()
+        guard let onScreen = onScreenWindowsIfFollowable(pid: pid, now: now) else {
+            return
+        }
+        // A switch leaves the previous window in view until the Space goes;
+        // closing or minimizing it hands focus on with the window already
+        // gone, and following then would carry the user off to another Space
+        if let previousWindowID,
+           !onScreen.contains(where: { $0[kCGWindowNumber as String] as? Int == Int(previousWindowID) })
+        {
+            Self.logger.debug("focus of wid=\(windowID) ruled out: wid=\(previousWindowID) closed or minimized")
+            return
+        }
+        let layout = Self.spaceLayout(connection: conn)
+        // The focused window alone decides: the app's other windows say
+        // nothing about where this one lives
+        guard let candidate = Self.windowCandidate(windowID, connection: conn, onScreen: onScreen),
+              let target = Self.targetSpaceID(
+                  for: [candidate],
+                  activeSpaceIDs: layout.active,
+                  followableSpaceIDs: layout.followable
+              )
+        else {
+            Self.logger.debug("focus of wid=\(windowID) needs no switch")
+            return
+        }
+        Self.logger.info("following focus of pid=\(pid) wid=\(windowID) to space \(target)")
+        lastFocusFollow = (windowID, now)
+        follow(pid: pid, to: target, now: now)
     }
 
     /// Classic switching is excluded: it slides just like the Dock, so it
@@ -141,9 +295,9 @@ final class AppActivationFollower {
 
     private func handleSpaceChange() {
         let now = Date()
-        if let lastFollow, now.timeIntervalSince(lastFollow.date) < Self.followSettleWindow,
-           Self.spaceLayout(connection: _CGSDefaultConnection()).active.contains(lastFollow.spaceID)
-        {
+        settlingFollows.removeAll { now.timeIntervalSince($0.date) >= Self.followSettleWindow }
+        let active = Self.spaceLayout(connection: _CGSDefaultConnection()).active
+        if settlingFollows.contains(where: { active.contains($0.spaceID) }) {
             return
         }
         lastUserSpaceChange = now
@@ -234,26 +388,42 @@ final class AppActivationFollower {
         }
         let states = CGSDisplaySpaceProvider.windowServerStates(windows.map(\.id), connection: connection)
         return windows.compactMap { window in
-            var isMinimized = false
-            var isClosed = false
-            if let states {
-                // Unknown to the window server: gone, not merely closed
-                guard let state = states[window.id] else {
-                    return nil
-                }
-                isClosed = !CGSDisplaySpaceProvider.isSpaceOccupant(attributes: state.attributes, tags: state.tags)
-                isMinimized = state.tags & CGSDisplaySpaceProvider.minimizedTags != 0
-            }
-            // Selector 0x7 = all spaces the window is on
-            let spaces = SLSCopySpacesForWindows(connection, 0x7, [window.id] as CFArray)?
-                .takeRetainedValue() as? [Int] ?? []
-            return WindowCandidate(
-                spaceIDs: spaces,
-                isOnScreen: window.isOnScreen,
-                isMinimized: isMinimized,
-                isClosed: isClosed
-            )
+            candidate(window.id, isOnScreen: window.isOnScreen, states: states, connection: connection)
         }
+    }
+
+    private static func windowCandidate(
+        _ windowID: CGWindowID,
+        connection: Int32,
+        onScreen: [[String: Any]]
+    ) -> WindowCandidate? {
+        let id = Int(windowID)
+        let isOnScreen = onScreen.contains { $0[kCGWindowNumber as String] as? Int == id }
+        let states = CGSDisplaySpaceProvider.windowServerStates([id], connection: connection)
+        return candidate(id, isOnScreen: isOnScreen, states: states, connection: connection)
+    }
+
+    /// Nil for a window the window server no longer knows. `states` nil
+    /// means the query failed, and the window then counts as open.
+    private static func candidate(
+        _ id: Int,
+        isOnScreen: Bool,
+        states: [Int: (attributes: UInt64, tags: UInt64)]?,
+        connection: Int32
+    ) -> WindowCandidate? {
+        var isMinimized = false
+        var isClosed = false
+        if let states {
+            guard let state = states[id] else {
+                return nil
+            }
+            isClosed = !CGSDisplaySpaceProvider.isSpaceOccupant(attributes: state.attributes, tags: state.tags)
+            isMinimized = state.tags & CGSDisplaySpaceProvider.minimizedTags != 0
+        }
+        // Selector 0x7 = all spaces the window is on
+        let spaces = SLSCopySpacesForWindows(connection, 0x7, [id] as CFArray)?
+            .takeRetainedValue() as? [Int] ?? []
+        return WindowCandidate(spaceIDs: spaces, isOnScreen: isOnScreen, isMinimized: isMinimized, isClosed: isClosed)
     }
 
     private static var secondsSinceLastClick: TimeInterval {

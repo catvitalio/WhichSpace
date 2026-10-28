@@ -170,7 +170,7 @@ struct SystemFrontWindowLocator: FrontWindowLocating {
     /// error codes separate a dead element (-25202) from an unresponsive
     /// application (-25204), which point at different failures when a move
     /// picks the wrong window.
-    private static func focusedWindowID(ofApplication pid: pid_t) -> CGWindowID? {
+    static func focusedWindowID(ofApplication pid: pid_t) -> CGWindowID? {
         guard AXIsProcessTrusted() else {
             return nil
         }
